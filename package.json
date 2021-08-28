@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/fateme3611/tinyapp/issues"
   },
-  "homepage": "https://github.com/fateme3611/tinyapp#readme"
+  "homepage": "https://github.com/fateme3611/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
