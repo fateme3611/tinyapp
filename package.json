@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/fateme3611/tinyapp#readme",
   "dependencies": {
+    "ejs": "^3.1.6",
     "express": "^4.17.1"
   }
 }
