@@ -1,18 +1,13 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-
+const generateRandomString = require('./utils/randomGenerator');
 app.set("view engine", "ejs");
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-
-function generateRandomString() {
-
-}
-
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -25,6 +20,12 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.post("/urls", (req, res) => {
+  const url = req.body.longURL;
+  const tinyUrl = generateRandomString(6);
+  urlDatabase[tinyUrl] = url;
+  res.redirect("/urls/" + tinyUrl);
+});
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -46,6 +47,7 @@ app.post("/urls/:shortURL", (req, res) => {
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 app.get("/u/:shortURL", (req, res) => {
-  // const longURL = ...
+  const key = req.params.shortURL;
+  const longURL = urlDatabase[key];
   res.redirect(longURL);
 });
