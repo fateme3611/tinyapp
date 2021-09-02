@@ -43,8 +43,9 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 app.post("/urls/:shortURL", (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.newUrl;
   console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  res.redirect('/urls');        // Respond with 'Ok' (we will replace this)
 });
 app.get("/u/:shortURL", (req, res) => {
   const key = req.params.shortURL;
@@ -54,5 +55,5 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const key = req.params.shortURL;
   delete urlDatabase[key];
-  res.redirect('/urls')
+  res.redirect('/urls');
 });
