@@ -129,3 +129,8 @@ app.post("/register", (req, res) => {
   res.redirect('/urls');
   console.log(users);
 });
+
+app.get("/login", (req, res) => {
+  const user = users[req.cookies["user_id"]];
+  res.render('urls_login', { user: user });
+});

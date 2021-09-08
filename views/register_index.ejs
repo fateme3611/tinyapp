@@ -16,16 +16,16 @@
     <main style="margin: 1em;">
       <h3>Registration for new user</h3>
       <form method="POST" action="/register">
-        <label> email
-          <input type="email" name="email" required />
+        <label> Email
         </label>
+        <input class="form-control" type="email" name="email" required />
 
         <label>
-          password
-          <input type="password" name="password" required />
+          Password
         </label>
-
-        <button type="submit">Login</button>
+        <input class="form-control" type="password" name="password" required />
+        <br />
+        <button class="form-control btn-primary" type="submit">Login</button>
       </form>
 
     </main>
