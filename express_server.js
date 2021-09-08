@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser')
 const express = require("express");
 const app = express();
@@ -105,8 +106,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/login", (req, res) => {
 
   const user = findUserByEmail(req.body.username, users);
-
-  if (user && user.id && user.password == req.body.password) {
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  if (user && user.id && user.password == hashedPassword) {
     res.cookie("user_id", user.id);
     res.redirect('/urls');
     return;
@@ -143,7 +144,7 @@ app.post("/register", (req, res) => {
   const newUser = {
     id: userId,
     email: req.body.email,
-    password: req.body.password
+    password: bcrypt.hashSync(req.body.password, 10)
   };
   users[userId] = newUser;
   res.cookie("user_id", userId);
