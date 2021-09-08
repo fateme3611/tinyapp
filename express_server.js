@@ -92,7 +92,7 @@ app.post("/login", (req, res) => {
     res.redirect('/urls');
   }
 
-  res.send('invalid user');
+  res.sendStatus(403);
 });
 
 app.post("/logout", (req, res) => {
@@ -112,6 +112,11 @@ app.post("/register", (req, res) => {
   }
 
   const user = findUserByEmail(req.body.email);
+
+  if (user.password !== req.body.password) {
+    res.sendStatus(403);
+    return;
+  }
 
   if (user) {
     res.sendStatus(400);
