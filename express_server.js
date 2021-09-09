@@ -5,7 +5,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 const generateRandomString = require('./utils/randomGenerator');
-const findUserByEmail = require('./utils/findUserByEmail');
+const { getUserByEmail } = require('./helpers');
 const urlsForUser = require('./utils/urlsForUser');
 
 
@@ -108,7 +108,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
 
-  const user = findUserByEmail(req.body.username, users);
+  const user = getUserByEmail(req.body.username, users);
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   if (user && user.id && user.password == hashedPassword) {
     req.session["user_id"] = user.id;
@@ -136,7 +136,7 @@ app.post("/register", (req, res) => {
     return;
   }
 
-  const user = findUserByEmail(req.body.email, users);
+  const user = getUserByEmail(req.body.email, users);
 
 
   if (user) {

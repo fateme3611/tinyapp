@@ -1,4 +1,4 @@
-function findUserByEmail(email, users) {
+function getUserByEmail(email, users) {
     for (let userId in users) {
         let user = users[userId];
         if (user.email == email) {
@@ -8,4 +8,4 @@ function findUserByEmail(email, users) {
     return null;
 }
 
-module.exports = findUserByEmail;
+module.exports = { getUserByEmail };
