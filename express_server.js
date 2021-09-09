@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session')
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -24,9 +24,12 @@ const users = {
 };
 
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+//app.use(cookieParser());
 
-
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}))
 
 
 app.get("/", (req, res) => {
@@ -34,7 +37,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   if (!user) {
     res.redirect('/login');
     return;
@@ -47,13 +50,13 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   const url = req.body.longURL;
   const tinyUrl = generateRandomString(6);
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   urlDatabase[tinyUrl] = { longURL: url, userID: user.id };
   res.redirect("/urls/" + tinyUrl);
 });
 
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   if (user) {
     res.render("urls_new", { user: user });
   } else {
@@ -62,7 +65,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   if (!user) {
     res.redirect('/login');
     return;
@@ -76,7 +79,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   if (!user) {
     res.redirect('/login');
     return;
@@ -93,7 +96,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   if (!user) {
     res.redirect('/login');
     return;
@@ -108,7 +111,7 @@ app.post("/login", (req, res) => {
   const user = findUserByEmail(req.body.username, users);
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   if (user && user.id && user.password == hashedPassword) {
-    res.cookie("user_id", user.id);
+    req.session["user_id"] = user.id;
     res.redirect('/urls');
     return;
   }
@@ -117,12 +120,13 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id")
-    .redirect('/urls');
+  req.session["user_id"] = null;
+  //res.clearCookie("user_id")
+  res.redirect('/urls');
 });
 
 app.get('/register', (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   res.render('register_index', { user: user });
 });
 
@@ -147,12 +151,12 @@ app.post("/register", (req, res) => {
     password: bcrypt.hashSync(req.body.password, 10)
   };
   users[userId] = newUser;
-  res.cookie("user_id", userId);
+  req.session["user_id"] = userId;
   res.redirect('/urls');
 });
 
 app.get("/login", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session["user_id"]];
   res.render('urls_login', { user: user });
 });
 
