@@ -23,12 +23,16 @@ const users = {
   // },
 };
 
+
+
+const salt = bcrypt.genSaltSync(10);
+
 app.use(express.urlencoded({ extended: true }));
 //app.use(cookieParser());
 
 app.use(cookieSession({
   name: 'session',
-  keys: ['key1', 'key2']
+  keys: ['key1']
 }))
 
 
@@ -109,7 +113,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/login", (req, res) => {
 
   const user = getUserByEmail(req.body.username, users);
-  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  const hashedPassword = bcrypt.hashSync(req.body.password, salt);
   if (user && user.id && user.password == hashedPassword) {
     req.session["user_id"] = user.id;
     res.redirect('/urls');
@@ -148,7 +152,7 @@ app.post("/register", (req, res) => {
   const newUser = {
     id: userId,
     email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 10)
+    password: bcrypt.hashSync(req.body.password, salt)
   };
   users[userId] = newUser;
   req.session["user_id"] = userId;
