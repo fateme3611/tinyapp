@@ -1,3 +1,4 @@
+// return urls for every urlId store in urldatbase
 function urlsForUser(id, urlDatabase) {
     const res = {};
     for (let urlId in urlDatabase) {

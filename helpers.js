@@ -1,6 +1,6 @@
-function getUserByEmail(email, users) {
-    for (let userId in users) {
-        let user = users[userId];
+function getUserByEmail (email, users) {
+    for (const userId in users) {
+        const user = users[userId];
         if (user.email == email) {
             return user;
         }

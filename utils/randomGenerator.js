@@ -1,3 +1,4 @@
+//generate a random strings to be used as short url
 function generateRandomString(length) {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghigklmnopqrstuvwxyz1234567890"
     let result = '';

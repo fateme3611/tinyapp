@@ -12,23 +12,14 @@ const urlsForUser = require('./utils/urlsForUser');
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  // "9sm5xK": "http://www.google.com"
-  //b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
 };
+
 const users = {
-  // "userRandomID": {
-  //   id: "userRandomID", 
-  //   email: "user@example.com", 
-  //   password: "purple-monkey-dinosaur"
-  // },
 };
-
-
 
 const salt = bcrypt.genSaltSync(10);
 
 app.use(express.urlencoded({ extended: true }));
-//app.use(cookieParser());
 
 app.use(cookieSession({
   name: 'session',
@@ -43,7 +34,7 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const user = users[req.session["user_id"]];
   if (!user) {
-    res.redirect('/login');
+    res.render("notLoggedIn", { message: 'please login or register' });
     return;
   }
   const userUrl = urlsForUser(user.id, urlDatabase);
@@ -71,7 +62,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
   if (!user) {
-    res.redirect('/login');
+    res.render("notLoggedIn", { message: "you do not have permissions to edit this URL" });
     return;
   }
   const templateVars = { user: user, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
@@ -102,7 +93,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user = users[req.session["user_id"]];
   if (!user) {
-    res.redirect('/login');
+    res.render("notLoggedIn", { message: "you do not have permissions to edit this URL" });
     return;
   }
   const key = req.params.shortURL;
@@ -125,7 +116,6 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   req.session["user_id"] = null;
-  //res.clearCookie("user_id")
   res.redirect('/urls');
 });
 
