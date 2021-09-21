@@ -28,7 +28,7 @@ app.use(cookieSession({
 
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect('/urls');
 });
 
 app.get("/urls", (req, res) => {
@@ -43,9 +43,14 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  const user = users[req.session["user_id"]];
+  if (!user) {
+    const message = "you do not have permissions to edit this URL"
+    res.render("notLoggedIn", { message });
+    return;
+  }
   const url = req.body.longURL;
   const tinyUrl = generateRandomString(6);
-  const user = users[req.session["user_id"]];
   urlDatabase[tinyUrl] = { longURL: url, userID: user.id };
   res.redirect("/urls/" + tinyUrl);
 });
@@ -62,10 +67,15 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
   if (!user) {
-    res.render("notLoggedIn", { message: "you do not have permissions to edit this URL" });
+    const message = "you do not have permissions to edit this URL";
+    res.render("notLoggedIn", { message });
     return;
   }
-  const templateVars = { user: user, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
+  const templateVars = { 
+    user: user, 
+    shortURL: req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL].longURL 
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -81,7 +91,7 @@ app.post("/urls/:shortURL", (req, res) => {
   }
 
   urlDatabase[req.params.shortURL].longURL = req.body.newUrl;
-  res.redirect('/urls');        // Respond with 'Ok' (we will replace this)
+  res.redirect('/urls');
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -93,7 +103,8 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user = users[req.session["user_id"]];
   if (!user) {
-    res.render("notLoggedIn", { message: "you do not have permissions to edit this URL" });
+    const message = "you do not have permissions to edit this URL";
+    res.render("notLoggedIn", { message });
     return;
   }
   const key = req.params.shortURL;
@@ -101,8 +112,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+// get user name from browser login btn/form 
 app.post("/login", (req, res) => {
-
   const user = getUserByEmail(req.body.username, users);
   const hashedPassword = bcrypt.hashSync(req.body.password, salt);
   if (user && user.id && user.password == hashedPassword) {
@@ -119,11 +130,14 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls');
 });
 
+//get post to render the register page and extract data , drive user to main page /urls
 app.get('/register', (req, res) => {
   const user = users[req.session["user_id"]];
   res.render('register_index', { user: user });
 });
 
+// extract email/pass from browser /register page 
+//if the email does not exist, update users db with the newlly registered user
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     res.sendStatus(400);
