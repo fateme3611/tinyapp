@@ -89,9 +89,14 @@ app.post("/urls/:shortURL", (req, res) => {
     res.redirect('/login');
     return;
   }
-
-  urlDatabase[req.params.shortURL].longURL = req.body.newUrl;
-  res.redirect('/urls');
+  const storedUrl = urlDatabase[req.params.shortURL];
+  if (storedUrl.userID == req.session["user_id"]){
+    urlDatabase[req.params.shortURL].longURL = req.body.newUrl;
+    res.redirect('/urls');
+  } else {
+    const message = "you do not have permissions to edit this URL";
+    res.render("notLoggedIn", { message });
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -107,9 +112,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.render("notLoggedIn", { message });
     return;
   }
-  const key = req.params.shortURL;
-  delete urlDatabase[key];
-  res.redirect('/urls');
+  const storedUrl = urlDatabase[req.params.shortURL];
+  if (storedUrl.userID == req.session["user_id"]){
+    const key = req.params.shortURL;
+    delete urlDatabase[key];
+    res.redirect('/urls');
+  } else {
+    const message = "you do not have permissions to edit this URL";
+    res.render("notLoggedIn", { message });
+  } 
 });
 
 // get user name from browser login btn/form 
